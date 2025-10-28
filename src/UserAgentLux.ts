@@ -4,14 +4,15 @@ export class UserAgentLux {
     static lum(userAgent: string): Lum | null {
         if (!userAgent) return null;
 
-        const browser: NameVersion = { name: 'Unknown', version: null };
+        const browser: NameVersion = { name: 'Unknown', version: 'Unknown' };
         const rules = [ // Order matters!
             { name: 'Edge', re: /EdgA?\/([\d.]+)/ },
             { name: 'Opera', re: /OPR\/([\d.]+)/ },
+            { name: 'Brave', re: /Brave?\/([\d.]+)/ },
             { name: 'Samsung Internet', re: /SamsungBrowser\/([\d.]+)/ },
             { name: 'Firefox', re: /(?:Firefox|FxiOS)\/([\d.]+)/ },
             { name: 'Chrome', re: /(?:Chrome|CriOS)\/([\d.]+)/ },
-            { name: 'Safari', re: /Version\/([\d.]+).*Safari/ }
+            { name: 'Safari', re: /Version\/([\d.]+).*Safari/ },
         ];
         for (const r of rules) {
             const m = userAgent.match(r.re);
@@ -35,27 +36,27 @@ export class UserAgentLux {
             }
         }
 
-        const os: NameVersion = { name: 'Unknown', version: null };
+        const os: NameVersion = { name: 'Unknown', version: 'Unknown' };
         const isIPadOS13Plus = navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
         if (/\bWindows NT\b/.test(userAgent)) {
             os.name = 'Windows';
             const m = userAgent.match(/Windows NT ([\d.]+)/);
-            os.version = m ? (WINDOWS_VERSIONS_MAP[m[1]] || m[1]) : null;
+            os.version = m ? (WINDOWS_VERSIONS_MAP[m[1]] || m[1]) : 'Unknown';
         } else if (/\bAndroid\b/i.test(userAgent)) {
             os.name = 'Android';
             const m = userAgent.match(/Android (\d+(?:\.\d+)?)/i);
-            os.version = m ? m[1] : null;
+            os.version = m ? m[1] : 'Unknown';
         } else if (/\biPhone|iPad|iPod\b/i.test(userAgent)) {
             os.name = 'iOS';
             const m = userAgent.match(/OS (\d+[_.\d]*)/i);
-            os.version = m ? m[1].replace(/_/g, '.') : null;
+            os.version = m ? m[1].replace(/_/g, '.') : 'Unknown';
         } else if (isIPadOS13Plus) {
             os.name = 'iOS';
-            os.version = null;
+            os.version = 'Unknown';
         } else if (/\bMac OS X\b/.test(userAgent)) {
             os.name = 'macOS';
             const m = userAgent.match(/Mac OS X (\d+[_.\d]*)/);
-            os.version = m ? m[1].replace(/_/g, '.') : null;
+            os.version = m ? m[1].replace(/_/g, '.') : 'Unknown';
         } else if (/\bCrOS\b/.test(userAgent)) {
             os.name = 'Chrome OS';
         } else if (/\bLinux\b/.test(userAgent)) {
@@ -95,6 +96,7 @@ export class UserAgentLux {
 }
 
 const WINDOWS_VERSIONS_MAP: Record<string, string> = {
+    '11.0': '11',
     '10.0': '10/11',
     '6.3': '8.1',
     '6.2': '8',
